@@ -20,4 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn(Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, Request $request) {
+            return redirect()->route('login')->withErrors([
+                'email' => 'Akses ditolak! Silakan login terlebih dahulu.'
+            ]);
+        });
     })->create();

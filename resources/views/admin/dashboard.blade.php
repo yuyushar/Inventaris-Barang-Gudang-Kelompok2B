@@ -1,19 +1,8 @@
-<!DOCTYPE html>
-<html>
+<x-layout>
+    <x-slot:title>Dashboard Admin</x-slot:title>
 
-<head>
-    <title>Dashboard Admin</title>
-</head>
-
-<body style="background-color: #f8d7da; padding: 20px;">
-    <h1>Selamat Datang, Bos Admin! 👑</h1>
-    <p>Anda login sebagai: <b>{{ Auth::user()->name }}</b></p>
-    <p>Di halaman ini nanti Anda bisa mengatur Pengguna, Kategori, Supplier, dan Data Barang.</p>
-
-    <form action="/logout" method="POST">
-        @csrf
-        <button type="submit" style="padding: 10px; background: red; color: white;">Logout</button>
-    </form>
-</body>
-
-</html>
+    <div class="card">
+        <h1>Selamat Datang di Area Master Data! 👑</h1>
+        <p>Ini adalah halaman utama Admin. Silakan pilih menu di sebelah kiri untuk mulai mengatur data pondasi aplikasi.</p>
+    </div>
+</x-layout>
