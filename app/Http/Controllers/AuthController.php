@@ -24,8 +24,14 @@ class AuthController extends Controller
         // Jika email dan password cocok di database
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            // Arahkan ke halaman utama setelah login (sementara arahkan ke '/')
-            return redirect()->intended('/'); 
+
+            // Cek role dan arahkan ke dashboard masing-masing
+            $role = Auth::user()->role;
+            if ($role === 'admin') {
+                return redirect('/admin/dashboard');
+            } else {
+                return redirect('/petugas/dashboard');
+            }
         }
 
         // Jika gagal, kembalikan ke halaman login dengan pesan error
