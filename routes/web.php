@@ -2,6 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\BarangController;
+// --------------------------------------------------------------------------
+// 1. RUTE PUBLIK & GUEST (Bisa diakses tanpa login)
+// --------------------------------------------------------------------------
 
 // Halaman Panduan (Publik: Tamu, Admin, & Petugas bisa akses kapan saja)
 Route::get('/panduan', function () {
@@ -23,6 +30,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // --------------------------------------------------------------------------
 Route::middleware('auth')->group(function () {
 
+    // Jalur Utama (/): Mengarahkan otomatis sesuai Role
     Route::get('/', function () {
         if (auth()->user()->role === 'admin') {
             return redirect('/admin/dashboard');
@@ -30,20 +38,20 @@ Route::middleware('auth')->group(function () {
         return redirect('/petugas/dashboard');
     });
 
+    // Area Admin (Khusus Admin)
     Route::middleware('role:admin')->prefix('admin')->group(function () {
         Route::get('/dashboard', function () { return view('admin.dashboard'); });
-        
-        // Halaman Kosongan Admin
-        Route::get('/user', function () { return view('admin.user'); });
-        Route::get('/supplier', function () { return view('admin.supplier'); });
-        Route::get('/kategori', function () { return view('admin.kategori'); });
-        Route::get('/barang', function () { return view('admin.barang'); });
+        Route::resource('/user', UserController::class)->except(['create', 'edit', 'show']);
+        Route::resource('/supplier', SupplierController::class)->except(['create', 'edit', 'show']);
+        Route::resource('/kategori', KategoriController::class)->except(['create', 'edit', 'show']);
+        Route::resource('/barang', BarangController::class)->except(['create', 'edit', 'show']);
         Route::get('/laporan', function () { return view('admin.laporan'); });
     });
+
+    // Area Petugas (Khusus Petugas)
     Route::middleware('role:petugas')->prefix('petugas')->group(function () {
         Route::get('/dashboard', function () { return view('petugas.dashboard'); });
         
-        // Halaman Kosongan Petugas
         Route::get('/barang-masuk', function () { return view('petugas.barang_masuk'); });
         Route::get('/barang-keluar', function () { return view('petugas.barang_keluar'); });
         Route::get('/peminjaman', function () { return view('petugas.peminjaman'); });

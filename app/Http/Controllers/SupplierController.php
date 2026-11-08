@@ -2,63 +2,56 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 
 class SupplierController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $suppliers = Supplier::latest()->get();
+        return view('admin.supplier', compact('suppliers'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nama_supplier' => 'required|string|max:255',
+            'telepon'       => 'nullable|string|max:20',
+            'email'         => 'nullable|email|max:255',
+            'alamat'        => 'nullable|string',
+        ]);
+
+        Supplier::create($request->all());
+
+        return redirect('/admin/supplier')->with('success', 'Supplier berhasil ditambahkan!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'nama_supplier' => 'required|string|max:255',
+            'telepon'       => 'nullable|string|max:20',
+            'email'         => 'nullable|email|max:255',
+            'alamat'        => 'nullable|string',
+        ]);
+
+        $supplier = Supplier::findOrFail($id);
+        $supplier->update($request->all());
+
+        return redirect('/admin/supplier')->with('success', 'Data supplier berhasil diperbarui!');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $supplier = Supplier::findOrFail($id);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        // Mencegah hapus supplier jika sudah ada riwayat pasokan barang
+        if ($supplier->barangMasuk()->count() > 0) {
+            return redirect('/admin/supplier')->with('error', 'Supplier tidak dapat dihapus karena memiliki riwayat pasokan barang!');
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $supplier->delete();
+        return redirect('/admin/supplier')->with('success', 'Supplier berhasil dihapus!');
     }
 }
