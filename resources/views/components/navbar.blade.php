@@ -7,17 +7,21 @@
     <!-- Daftar Menu -->
     <nav class="nav flex-column mb-auto custom-sidebar-nav">
         @if (Auth::user()->role === 'admin')
+            <a href="/admin/dashboard">Dashboard</a>
             <a href="/admin/user">Kelola User</a>
             <a href="/admin/supplier">Kelola Supplier</a>
             <a href="/admin/kategori">Kelola Kategori</a>
             <a href="/admin/barang">Data Induk Barang</a>
             <a href="/admin/laporan">Laporan Gudang</a>
         @else
+            <a href="/petugas/dashboard">Dashboard</a>
             <a href="/petugas/barang-masuk">Barang Masuk</a>
             <a href="/petugas/barang-keluar">Barang Keluar</a>
             <a href="/petugas/peminjaman">Transaksi Peminjaman</a>
             <a href="/petugas/riwayat-stok">Riwayat Stok (Log)</a>
         @endif
+        <hr class="text-secondary my-2">
+        <a href="/panduan" target="_blank">📖 Panduan Penggunaan</a>
     </nav>
 
     <hr>

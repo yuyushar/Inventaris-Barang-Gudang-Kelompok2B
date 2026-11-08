@@ -3,11 +3,24 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
-// Rute untuk Login & Logout
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+// Halaman Panduan (Publik: Tamu, Admin, & Petugas bisa akses kapan saja)
+Route::get('/panduan', function () {
+    return view('panduan');
+});
 
+// Fitur Login (Hanya untuk yang BELUM login)
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
+});
+
+// Logout (Hanya untuk yang SUDAH login)
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+
+// --------------------------------------------------------------------------
+// 2. RUTE TERPROTEKSI (Wajib Login / Auth)
+// --------------------------------------------------------------------------
 Route::middleware('auth')->group(function () {
 
     Route::get('/', function () {
