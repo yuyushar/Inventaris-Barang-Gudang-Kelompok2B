@@ -6,8 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class BarangMasuk extends Model
 {
-    protected $table = 'barang_masuk'; 
+    protected $table = 'barang_masuk';
+
     protected $guarded = ['id'];
+
+    protected function casts(): array
+    {
+        return [
+            'tanggal' => 'datetime',
+        ];
+    }
 
     // Relasi ke tabel Supplier (supplier_id)
     public function supplier()
