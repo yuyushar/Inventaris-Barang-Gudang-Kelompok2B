@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BarangKeluarController;
@@ -46,9 +47,7 @@ Route::middleware('auth')->group(function () {
 
     // Area Admin (Khusus Admin)
     Route::middleware('role:admin')->prefix('admin')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        });
+        Route::get('/dashboard', AdminDashboardController::class)->name('admin.dashboard');
         Route::resource('/user', UserController::class)->except(['create', 'edit', 'show']);
         Route::resource('/supplier', SupplierController::class)->except(['create', 'edit', 'show']);
         Route::resource('/kategori', KategoriController::class)->except(['create', 'edit', 'show']);
