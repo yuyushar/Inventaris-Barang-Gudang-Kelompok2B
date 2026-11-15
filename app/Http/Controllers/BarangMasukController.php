@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Barang;
 use App\Models\BarangMasuk;
-use App\Models\RiwayatStok;
 use App\Models\Supplier;
+use App\Services\StockMovementService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +30,7 @@ class BarangMasukController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, StockMovementService $stockMovement): RedirectResponse
     {
         $validated = $request->validate([
             'supplier_id' => ['required', 'exists:supplier,id'],
@@ -41,32 +41,27 @@ class BarangMasukController extends Controller
             'jumlah.min' => 'Jumlah barang masuk minimal 1.',
         ]);
 
-        DB::transaction(function () use ($validated, $request): void {
-            $barang = Barang::query()
-                ->lockForUpdate()
-                ->findOrFail($validated['barang_id']);
+        DB::transaction(function () use ($validated, $request, $stockMovement): void {
             $nomorTransaksi = 'BM-'.Str::ulid();
 
             BarangMasuk::query()->create([
                 'nomor_transaksi' => $nomorTransaksi,
                 'tanggal' => $validated['tanggal'],
                 'supplier_id' => $validated['supplier_id'],
-                'barang_id' => $barang->id,
+                'barang_id' => $validated['barang_id'],
                 'jumlah' => $validated['jumlah'],
                 'user_id' => $request->user()->id,
             ]);
 
-            $barang->increment('stok_baik', $validated['jumlah']);
-
-            RiwayatStok::query()->create([
-                'barang_id' => $barang->id,
-                'user_id' => $request->user()->id,
-                'jenis_transaksi' => 'masuk',
-                'kondisi' => 'baik',
-                'jumlah' => $validated['jumlah'],
-                'tanggal' => $validated['tanggal'],
-                'keterangan' => 'Nomor transaksi: '.$nomorTransaksi,
-            ]);
+            $stockMovement->record(
+                $validated['barang_id'],
+                'masuk',
+                'baik',
+                $validated['jumlah'],
+                $request->user(),
+                $validated['tanggal'],
+                'Nomor transaksi: '.$nomorTransaksi,
+            );
         });
 
         return redirect()

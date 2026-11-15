@@ -169,6 +169,47 @@ it('does not return a loan more than once', function () {
     $this->assertDatabaseCount('riwayat_stok', 0);
 });
 
+it('keeps a loan active when borrowed stock is inconsistent during return', function () {
+    $petugas = User::factory()->create(['role' => 'petugas']);
+    $kategori = Kategori::query()->create(['nama_kategori' => 'Elektronik']);
+    $barang = Barang::query()->create([
+        'kode_barang' => 'PIN-005',
+        'nama_barang' => 'Speaker',
+        'kategori_id' => $kategori->id,
+        'satuan' => 'unit',
+        'stok_baik' => 0,
+        'stok_dipinjam' => 0,
+    ]);
+    $peminjaman = Peminjaman::query()->create([
+        'nomor_peminjaman' => 'PM-TEST-003',
+        'barang_id' => $barang->id,
+        'peminjam_nama' => 'Eka',
+        'jumlah' => 1,
+        'tanggal_pinjam' => now()->subDay(),
+        'kondisi_saat_dipinjam' => 'baik',
+        'status' => 'dipinjam',
+        'user_id' => $petugas->id,
+    ]);
+
+    $response = $this->actingAs($petugas)->patch(
+        route('petugas.peminjaman.return', $peminjaman),
+        ['kondisi_saat_dikembalikan' => 'baik'],
+    );
+
+    $response->assertSessionHasErrors('jumlah');
+    $this->assertDatabaseHas('peminjaman', [
+        'id' => $peminjaman->id,
+        'status' => 'dipinjam',
+        'tanggal_kembali' => null,
+    ]);
+    $this->assertDatabaseHas('barang', [
+        'id' => $barang->id,
+        'stok_baik' => 0,
+        'stok_dipinjam' => 0,
+    ]);
+    $this->assertDatabaseCount('riwayat_stok', 0);
+});
+
 it('forbids an admin from accessing the loan module', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\RiwayatStokController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // 2. RUTE TERPROTEKSI (Wajib Login / Auth)
 // --------------------------------------------------------------------------
 Route::middleware('auth')->group(function () {
+    Route::get('/riwayat-stok', [RiwayatStokController::class, 'index'])->name('riwayat-stok.index');
 
     // Jalur Utama (/): Mengarahkan otomatis sesuai Role
     Route::get('/', function () {
@@ -70,8 +72,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/peminjaman', [PeminjamanController::class, 'store'])->name('petugas.peminjaman.store');
         Route::patch('/peminjaman/{peminjaman}/pengembalian', [PeminjamanController::class, 'return'])
             ->name('petugas.peminjaman.return');
-        Route::get('/riwayat-stok', function () {
-            return view('petugas.riwayat_stok');
-        });
+        Route::get('/riwayat-stok', [RiwayatStokController::class, 'index'])
+            ->name('petugas.riwayat-stok.index');
     });
 });

@@ -4,12 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Barang;
 use App\Models\BarangKeluar;
-use App\Models\RiwayatStok;
+use App\Services\StockMovementService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class BarangKeluarController extends Controller
@@ -28,7 +27,7 @@ class BarangKeluarController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, StockMovementService $stockMovement): RedirectResponse
     {
         $validated = $request->validate([
             'barang_id' => ['required', 'exists:barang,id'],
@@ -39,39 +38,27 @@ class BarangKeluarController extends Controller
             'jumlah.min' => 'Jumlah barang keluar minimal 1.',
         ]);
 
-        DB::transaction(function () use ($validated, $request): void {
-            $barang = Barang::query()
-                ->lockForUpdate()
-                ->findOrFail($validated['barang_id']);
-
-            if ($barang->stok_baik < $validated['jumlah']) {
-                throw ValidationException::withMessages([
-                    'jumlah' => 'Stok barang baik tidak mencukupi. Stok tersedia: '.$barang->stok_baik.'.',
-                ]);
-            }
-
+        DB::transaction(function () use ($validated, $request, $stockMovement): void {
             $nomorTransaksi = 'BK-'.Str::ulid();
 
             BarangKeluar::query()->create([
                 'nomor_transaksi' => $nomorTransaksi,
                 'tanggal' => $validated['tanggal'],
-                'barang_id' => $barang->id,
+                'barang_id' => $validated['barang_id'],
                 'jumlah' => $validated['jumlah'],
                 'tujuan' => $validated['tujuan'],
                 'user_id' => $request->user()->id,
             ]);
 
-            $barang->decrement('stok_baik', $validated['jumlah']);
-
-            RiwayatStok::query()->create([
-                'barang_id' => $barang->id,
-                'user_id' => $request->user()->id,
-                'jenis_transaksi' => 'keluar',
-                'kondisi' => 'baik',
-                'jumlah' => $validated['jumlah'],
-                'tanggal' => $validated['tanggal'],
-                'keterangan' => 'Nomor transaksi: '.$nomorTransaksi.'; Tujuan: '.$validated['tujuan'],
-            ]);
+            $stockMovement->record(
+                $validated['barang_id'],
+                'keluar',
+                'baik',
+                $validated['jumlah'],
+                $request->user(),
+                $validated['tanggal'],
+                'Nomor transaksi: '.$nomorTransaksi.'; Tujuan: '.$validated['tujuan'],
+            );
         });
 
         return redirect()

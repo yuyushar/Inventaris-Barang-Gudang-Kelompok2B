@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Barang;
 use App\Models\Peminjaman;
-use App\Models\RiwayatStok;
+use App\Services\StockMovementService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +28,7 @@ class PeminjamanController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, StockMovementService $stockMovement): RedirectResponse
     {
         $validated = $request->validate([
             'barang_id' => ['required', 'exists:barang,id'],
@@ -38,22 +38,12 @@ class PeminjamanController extends Controller
             'jumlah.min' => 'Jumlah peminjaman minimal 1.',
         ]);
 
-        DB::transaction(function () use ($validated, $request): void {
-            $barang = Barang::query()
-                ->lockForUpdate()
-                ->findOrFail($validated['barang_id']);
-
-            if ($barang->stok_baik < $validated['jumlah']) {
-                throw ValidationException::withMessages([
-                    'jumlah' => 'Stok barang baik tidak mencukupi. Stok tersedia: '.$barang->stok_baik.'.',
-                ]);
-            }
-
+        DB::transaction(function () use ($validated, $request, $stockMovement): void {
             $nomorPeminjaman = 'PM-'.Str::ulid();
 
             Peminjaman::query()->create([
                 'nomor_peminjaman' => $nomorPeminjaman,
-                'barang_id' => $barang->id,
+                'barang_id' => $validated['barang_id'],
                 'peminjam_nama' => $validated['peminjam_nama'],
                 'jumlah' => $validated['jumlah'],
                 'tanggal_pinjam' => now(),
@@ -62,18 +52,15 @@ class PeminjamanController extends Controller
                 'user_id' => $request->user()->id,
             ]);
 
-            $barang->decrement('stok_baik', $validated['jumlah']);
-            $barang->increment('stok_dipinjam', $validated['jumlah']);
-
-            RiwayatStok::query()->create([
-                'barang_id' => $barang->id,
-                'user_id' => $request->user()->id,
-                'jenis_transaksi' => 'peminjaman',
-                'kondisi' => 'baik',
-                'jumlah' => $validated['jumlah'],
-                'tanggal' => now(),
-                'keterangan' => 'Nomor peminjaman: '.$nomorPeminjaman.'; Peminjam: '.$validated['peminjam_nama'],
-            ]);
+            $stockMovement->record(
+                $validated['barang_id'],
+                'peminjaman',
+                'baik',
+                $validated['jumlah'],
+                $request->user(),
+                now(),
+                'Nomor peminjaman: '.$nomorPeminjaman.'; Peminjam: '.$validated['peminjam_nama'],
+            );
         });
 
         return redirect()
@@ -81,13 +68,16 @@ class PeminjamanController extends Controller
             ->with('success', 'Peminjaman berhasil dicatat.');
     }
 
-    public function return(Request $request, Peminjaman $peminjaman): RedirectResponse
-    {
+    public function return(
+        Request $request,
+        Peminjaman $peminjaman,
+        StockMovementService $stockMovement,
+    ): RedirectResponse {
         $validated = $request->validate([
             'kondisi_saat_dikembalikan' => ['required', 'in:baik,rusak_ringan,rusak'],
         ]);
 
-        DB::transaction(function () use ($validated, $peminjaman, $request): void {
+        DB::transaction(function () use ($validated, $peminjaman, $request, $stockMovement): void {
             $peminjaman = Peminjaman::query()
                 ->lockForUpdate()
                 ->findOrFail($peminjaman->id);
@@ -98,22 +88,7 @@ class PeminjamanController extends Controller
                 ]);
             }
 
-            $barang = Barang::query()
-                ->lockForUpdate()
-                ->findOrFail($peminjaman->barang_id);
-
-            if ($barang->stok_dipinjam < $peminjaman->jumlah) {
-                throw ValidationException::withMessages([
-                    'peminjaman' => 'Jumlah stok dipinjam tidak sesuai dengan data peminjaman. Hubungi administrator.',
-                ]);
-            }
-
             $kondisi = $validated['kondisi_saat_dikembalikan'];
-            $kolomStok = match ($kondisi) {
-                'baik' => 'stok_baik',
-                'rusak_ringan' => 'stok_rusak_ringan',
-                'rusak' => 'stok_rusak',
-            };
             $tanggalKembali = now();
 
             $peminjaman->update([
@@ -123,18 +98,15 @@ class PeminjamanController extends Controller
                 'status' => 'dikembalikan',
             ]);
 
-            $barang->decrement('stok_dipinjam', $peminjaman->jumlah);
-            $barang->increment($kolomStok, $peminjaman->jumlah);
-
-            RiwayatStok::query()->create([
-                'barang_id' => $barang->id,
-                'user_id' => $request->user()->id,
-                'jenis_transaksi' => 'pengembalian',
-                'kondisi' => $kondisi,
-                'jumlah' => $peminjaman->jumlah,
-                'tanggal' => $tanggalKembali,
-                'keterangan' => 'Nomor peminjaman: '.$peminjaman->nomor_peminjaman.'; Peminjam: '.$peminjaman->peminjam_nama,
-            ]);
+            $stockMovement->record(
+                $peminjaman->barang_id,
+                'pengembalian',
+                $kondisi,
+                $peminjaman->jumlah,
+                $request->user(),
+                $tanggalKembali,
+                'Nomor peminjaman: '.$peminjaman->nomor_peminjaman.'; Peminjam: '.$peminjaman->peminjam_nama,
+            );
         });
 
         return redirect()
