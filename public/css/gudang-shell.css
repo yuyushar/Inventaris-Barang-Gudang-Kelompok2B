@@ -1,0 +1,333 @@
+/* Gudang 2B shell — uses existing dark/blue palette */
+:root {
+    --g2b-sidebar: #1f2933;
+    --g2b-sidebar-deep: #192432;
+    --g2b-border: #e3e9f0;
+    --g2b-blue: #2563eb;
+    --g2b-muted: #64748b;
+}
+html,
+body {
+    min-height: 100%;
+    margin: 0;
+}
+body.g2b-app {
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        "Segoe UI",
+        sans-serif;
+    background: #f5f7fa;
+    color: #1f2937;
+    display: flex;
+    min-height: 100dvh;
+    overflow-x: hidden;
+}
+.g2b-sidebar {
+    width: 246px;
+    flex: 0 0 246px;
+    background: var(--g2b-sidebar);
+    color: #e2e8f0;
+    height: 100dvh;
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 1045;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+.g2b-sidebar-top {
+    padding: 23px 17px 19px;
+    position: relative;
+}
+.g2b-brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    color: #fff;
+    text-decoration: none;
+    padding: 2px 7px;
+}
+.g2b-brand:hover {
+    color: #fff;
+}
+.g2b-brand-mark {
+    height: 38px;
+    width: 38px;
+    border-radius: 11px;
+    background: #345b9a;
+    color: #eaf2ff;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+.g2b-brand-mark svg {
+    width: 23px;
+    height: 23px;
+}
+.g2b-brand-name {
+    font-size: 17px;
+    line-height: 1.15;
+    font-weight: 650;
+    letter-spacing: -0.5px;
+}
+.g2b-brand-name strong {
+    font-weight: 800;
+}
+.g2b-brand-name small {
+    display: block;
+    margin-top: 4px;
+    color: #a8b4c3;
+    font-size: 10px;
+    letter-spacing: 0.03em;
+    font-weight: 500;
+}
+.g2b-sidebar-close {
+    display: none;
+}
+.g2b-sidebar-scroll {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0 12px 12px;
+    scrollbar-width: thin;
+    scrollbar-color: #52606d transparent;
+}
+.g2b-nav-label {
+    color: #8e9baa;
+    font-size: 10px;
+    letter-spacing: 0.125em;
+    font-weight: 700;
+    margin: 10px 11px 9px;
+}
+.g2b-nav {
+    display: grid;
+    gap: 3px;
+}
+.g2b-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    color: #b8c3d0;
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    padding: 10px 12px;
+    min-height: 42px;
+    font-size: 12px;
+    font-weight: 550;
+    line-height: 1.25;
+    transition:
+        background 0.16s,
+        border-color 0.16s,
+        color 0.16s;
+}
+.g2b-nav-link > svg {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+}
+.g2b-nav-link:hover {
+    background: rgba(255, 255, 255, 0.075);
+    color: #fff;
+}
+.g2b-nav-link.is-active {
+    color: #fff;
+    background: #304967;
+    border-color: rgba(147, 197, 253, 0.13);
+    font-weight: 650;
+}
+.g2b-nav-link.is-active > svg {
+    color: #95c0ff;
+}
+.g2b-nav-link:focus-visible,
+.g2b-logout:focus-visible,
+.g2b-menu-toggle:focus-visible,
+.g2b-sidebar-close:focus-visible {
+    outline: 2px solid #93c5fd;
+    outline-offset: 2px;
+}
+.g2b-external {
+    margin-left: auto;
+    color: #91a0b3;
+}
+.g2b-nav-separator {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 17px 10px;
+}
+.g2b-sidebar-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 15px 16px 18px;
+}
+.g2b-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    margin-bottom: 13px;
+}
+.g2b-avatar {
+    height: 35px;
+    width: 35px;
+    flex: 0 0 35px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: #40556c;
+    color: #e8f0ff;
+    font-size: 13px;
+    font-weight: 700;
+}
+.g2b-user-text {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+}
+.g2b-user-text strong {
+    font-size: 12px;
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.g2b-user-text small {
+    font-size: 10px;
+    color: #9eabba;
+}
+.g2b-logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 9px;
+    color: #f6d3d3;
+    background: rgba(239, 68, 68, 0.09);
+    font-weight: 600;
+    padding: 10px;
+    font-size: 12px;
+    transition: background 0.16s;
+}
+.g2b-logout:hover {
+    background: rgba(239, 68, 68, 0.18);
+    color: #fff;
+}
+.g2b-logout svg {
+    height: 16px;
+    width: 16px;
+}
+.g2b-content {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+}
+.g2b-main {
+    min-width: 0;
+    flex: 1;
+    padding: clamp(18px, 2.4vw, 32px);
+    width: 100%;
+}
+.g2b-mobile-header {
+    display: none;
+}
+.g2b-backdrop {
+    display: none;
+}
+/* Mobile menu is overlay; underlying page remains full-width and scrollable. */
+@media (max-width: 991.98px) {
+    .g2b-sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        transform: translateX(-101%);
+        transition: transform 0.22s ease;
+        width: min(286px, 84vw);
+        height: 100dvh;
+    }
+    .g2b-sidebar.is-open {
+        transform: translateX(0);
+    }
+    .g2b-sidebar-close {
+        position: absolute;
+        right: 12px;
+        top: 25px;
+        display: grid;
+        place-items: center;
+        width: 31px;
+        height: 31px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 8px;
+        color: #cbd5e1;
+        background: transparent;
+    }
+    .g2b-sidebar-close svg {
+        height: 17px;
+        width: 17px;
+    }
+    .g2b-backdrop.is-visible {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.56);
+        z-index: 1040;
+    }
+    .g2b-mobile-header {
+        height: 59px;
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        background: #fff;
+        border-bottom: 1px solid var(--g2b-border);
+        padding: 0 18px;
+        position: sticky;
+        top: 0;
+        z-index: 1020;
+        font-size: 14px;
+        font-weight: 650;
+    }
+    .g2b-menu-toggle {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #fff;
+        color: #334155;
+    }
+    .g2b-menu-toggle svg {
+        width: 19px;
+        height: 19px;
+    }
+    .g2b-mobile-role {
+        margin-left: auto;
+        font-size: 11px;
+        font-weight: 600;
+        color: #64748b;
+    }
+    .g2b-main {
+        padding: 22px 17px;
+    }
+    .g2b-no-scroll {
+        overflow: hidden;
+    }
+}
+@media (max-width: 575.98px) {
+    .g2b-main {
+        padding: 17px 12px;
+    }
+    .g2b-mobile-header {
+        padding: 0 12px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .g2b-sidebar,
+    .g2b-nav-link,
+    .g2b-logout {
+        transition: none !important;
+    }
+}

@@ -1,8 +1,137 @@
-<x-layout>
-    <x-slot:title>Halaman Kelola User</x-slot:title>
-    
-    <div class="card">
-        <h2>Ini Halaman Kelola User</h2>
-        <p>Fitur tabel dan CRUD belum dibuat. Nanti backend akan melempar data ke sini.</p>
+<x-layout><x-slot:title>Kelola User · Gudang 2B</x-slot:title>
+    @include('admin.partials.assets')
+    <div class="fe-page">
+        <div class="fe-heading">
+            <div>
+                <div class="fe-eyebrow">MASTER DATA / PENGGUNA</div>
+                <h1>Kelola User</h1>
+                <p>Atur akun dan akses pengguna sistem inventaris.</p>
+            </div><button class="btn fe-btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">+ Tambah
+                user</button>
+        </div>
+        <div class="fe-summary"><span class="fe-summary-icon">U</span>
+            <div><strong>{{ $users->count() }} pengguna terdaftar</strong><small>Kelola hak akses admin dan petugas
+                    secara terpusat.</small></div>
+        </div>
+        <section class="fe-card">
+            <div class="fe-card-header">
+                <h2>Daftar pengguna</h2><span>Informasi akun dan peran</span>
+            </div>
+            <div class="table-responsive">
+                <table id="usersTable" class="table fe-table align-middle w-100">
+                    <thead>
+                        <tr>
+                            <th>Nama pengguna</th>
+                            <th>Email</th>
+                            <th>Hak akses</th>
+                            <th>Terdaftar</th>
+                            <th class="fe-actions-col">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody>@foreach($users as $item)
+                        <tr>
+                            <td>
+                                <div class="fe-cell-title">{{ $item->name }}</div>@if(auth()->id() === $item->id)<small
+                                class="text-muted">Akun Anda</small>@endif
+                            </td>
+                            <td>{{ $item->email }}</td>
+                            <td><span
+                                    class="fe-badge {{ $item->role === 'admin' ? 'fe-badge-blue' : 'fe-badge-gray' }}">{{ ucfirst($item->role) }}</span>
+                            </td>
+                            <td data-order="{{ $item->created_at?->timestamp }}">
+                                {{ $item->created_at?->format('d M Y') }}</td>
+                            <td>
+                                <div class="fe-actions"><button type="button" class="btn fe-btn-light fe-edit"
+                                        data-bs-toggle="modal" data-bs-target="#editModal" data-id="{{ $item->id }}"
+                                        data-name="{{ $item->name }}" data-email="{{ $item->email }}"
+                                        data-role="{{ $item->role }}">Edit</button>@include('admin.partials.delete', ['url' => url('admin/user/' . $item->id), 'label' => $item->name])
+                                </div>
+                            </td>
+                    </tr>@endforeach
+                    </tbody>
+                </table>
+            </div>
+        </section>@php($prefix = 'add')
+        <div class="modal fade fe-modal" id="addModal" tabindex="-1" aria-labelledby="addModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div>
+                            <div class="fe-eyebrow">FORMULIR DATA</div>
+                            <h2 class="modal-title fs-5" id="addModalTitle">Tambah pengguna</h2>
+                        </div><button class="btn-close" type="button" data-bs-dismiss="modal"
+                            aria-label="Tutup"></button>
+                    </div>
+                    <form method="POST" action="{{ url('admin/user') }}">@csrf <div class="modal-body">
+                            <div class="mb-3"><label class="form-label" for="{{ $prefix }}_name">Nama lengkap <span
+                                        class="fe-required">*</span></label><input id="{{ $prefix }}_name" name="name"
+                                    type="text" class="form-control" required maxlength="255" value=""></div>
+                            <div class="mb-3"><label class="form-label" for="{{ $prefix }}_email">Alamat email <span
+                                        class="fe-required">*</span></label><input id="{{ $prefix }}_email" name="email"
+                                    type="email" class="form-control" required maxlength="255" value=""></div>
+                            <div class="mb-3"><label class="form-label" for="{{ $prefix }}_password">Password <span
+                                        class="fe-required">*</span></label><input id="{{ $prefix }}_password"
+                                    name="password" type="password" class="form-control" required minlength="6"
+                                    pattern="(?=.*[0-9]).{6,}" value="">
+                                <div class="form-text">Minimal 6 karakter dan mengandung angka.</div>
+                            </div>
+                            <div class="mb-3"><label class="form-label" for="{{ $prefix }}_role">Peran pengguna <span
+                                        class="fe-required">*</span></label><select name="role" id="{{ $prefix }}_role"
+                                    class="form-select" required>
+                                    <option value="">Pilih peran pengguna</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="petugas">Petugas</option>
+                                </select></div>
+                        </div>
+                        <div class="modal-footer"><button type="button" class="btn fe-btn-secondary"
+                                data-bs-dismiss="modal">Batal</button><button type="submit"
+                                class="btn fe-btn-primary">Simpan data</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>@php($prefix = 'edit')
+        <div class="modal fade fe-modal" id="editModal" tabindex="-1" aria-labelledby="editModalTitle"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div>
+                            <div class="fe-eyebrow">FORMULIR DATA</div>
+                            <h2 class="modal-title fs-5" id="editModalTitle">Edit pengguna</h2>
+                        </div><button class="btn-close" type="button" data-bs-dismiss="modal"
+                            aria-label="Tutup"></button>
+                    </div>
+                    <form method="POST" data-action-template="{{ url('admin/user') }}/__ID__" action="#">@csrf
+                        @method('PUT')<input type="hidden" name="_edit_id" value="">
+                        <div class="modal-body">
+                            <div class="mb-3"><label class="form-label" for="{{ $prefix }}_name">Nama lengkap <span
+                                        class="fe-required">*</span></label><input id="{{ $prefix }}_name" name="name"
+                                    type="text" class="form-control" required value=""></div>
+                            <div class="mb-3"><label class="form-label" for="{{ $prefix }}_email">Alamat email <span
+                                        class="fe-required">*</span></label><input id="{{ $prefix }}_email" name="email"
+                                    type="email" class="form-control" required value=""></div>
+                            <div class="mb-3"><label class="form-label" for="{{ $prefix }}_password">Password
+                                    baru</label><input id="{{ $prefix }}_password" name="password" type="password"
+                                    class="form-control" value="">
+                                <div class="form-text">Kosongkan jika tidak ingin mengubah password. Jika diisi, minimal
+                                    6 karakter dan mengandung angka.</div>
+                            </div>
+                            <div class="mb-3"><label class="form-label" for="{{ $prefix }}_role">Peran pengguna <span
+                                        class="fe-required">*</span></label><select name="role" id="{{ $prefix }}_role"
+                                    class="form-select" required>
+                                    <option value="">Pilih peran pengguna</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="petugas">Petugas</option>
+                                </select></div>
+                        </div>
+                        <div class="modal-footer"><button type="button" class="btn fe-btn-secondary"
+                                data-bs-dismiss="modal">Batal</button><button type="submit"
+                                class="btn fe-btn-primary">Simpan data</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+    @include('admin.partials.validation')
+    @include('admin.partials.scripts')
 </x-layout>
