@@ -7,6 +7,7 @@
         ['/admin/supplier', 'Kelola Supplier', 'truck'],
         ['/admin/kategori', 'Kelola Kategori', 'grid'],
         ['/admin/barang', 'Data Induk Barang', 'box'],
+        ['/riwayat-stok', 'Riwayat Stok (Log)', 'history'],
         ['/admin/laporan', 'Laporan Gudang', 'chart'],
     ] : [
         ['/petugas/dashboard', 'Dashboard', 'home'],
@@ -48,7 +49,7 @@
         <p class="g2b-nav-label">MENU UTAMA</p>
         <nav class="g2b-nav" aria-label="Menu {{ $isAdmin ? 'admin' : 'petugas' }}">
             @foreach($items as [$url, $label, $icon])
-            @php($active = request()->is(ltrim($url, '/')))
+            @php($active = request()->is(ltrim($url, '/'), ltrim($url, '/').'/*'))
             <a class="g2b-nav-link {{ $active ? 'is-active' : '' }}" href="{{ $url }}" @if($active) aria-current="page"
             @endif>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round"
