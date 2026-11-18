@@ -7,6 +7,7 @@ use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\PetugasDashboardController;
 use App\Http\Controllers\RiwayatStokController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
@@ -59,9 +60,7 @@ Route::middleware('auth')->group(function () {
 
     // Area Petugas (Khusus Petugas)
     Route::middleware('role:petugas')->prefix('petugas')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('petugas.dashboard');
-        });
+        Route::get('/dashboard', PetugasDashboardController::class)->name('petugas.dashboard');
 
         Route::get('/barang-masuk', [BarangMasukController::class, 'index'])->name('petugas.barang-masuk.index');
         Route::post('/barang-masuk', [BarangMasukController::class, 'store'])->name('petugas.barang-masuk.store');
