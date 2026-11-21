@@ -331,3 +331,32 @@ body.g2b-app {
         transition: none !important;
     }
 }
+
+/* Aksesibilitas: lompat ke konten utama (muncul saat fokus keyboard) */
+.g2b-skip-link {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 3000;
+    padding: 9px 14px;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transform: translateY(-200%);
+    transition: transform 0.16s ease;
+}
+.g2b-skip-link:focus {
+    transform: translateY(0);
+    color: #fff;
+}
+.g2b-main:focus {
+    outline: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    .g2b-skip-link {
+        transition: none;
+    }
+}

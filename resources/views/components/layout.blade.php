@@ -14,6 +14,7 @@
 </head>
 
 <body class="g2b-app">
+    <a class="g2b-skip-link" href="#main-content">Lewati ke konten utama</a>
     <x-navbar>{{ $menu ?? '' }}</x-navbar>
     <div class="g2b-backdrop" data-sidebar-close aria-hidden="true"></div>
     <div class="g2b-content">
@@ -27,7 +28,7 @@
             <span>Gudang <strong>2B</strong></span>
             <span class="g2b-mobile-role">{{ auth()->user()->role === 'admin' ? 'Admin' : 'Petugas' }}</span>
         </header>
-        <main id="main-content" class="g2b-main">
+        <main id="main-content" class="g2b-main" tabindex="-1">
             {{ $slot }}
         </main>
     </div>

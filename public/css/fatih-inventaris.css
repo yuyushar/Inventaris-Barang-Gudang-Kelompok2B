@@ -938,3 +938,168 @@
     color: #b45309;
     background: #fffbeb;
 }
+
+/* Dashboard petugas: shortcut transaksi */
+.fe-shortcut-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+.fe-shortcut {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 13px;
+    padding: 16px 18px;
+    color: inherit;
+    text-decoration: none;
+    box-shadow: 0 3px 16px rgba(15, 23, 42, 0.035);
+    transition:
+        border-color 0.16s ease,
+        transform 0.16s ease,
+        box-shadow 0.16s ease;
+    animation: fe-reveal 0.32s ease both;
+}
+.fe-shortcut:hover {
+    color: inherit;
+    border-color: #93c5fd;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.1);
+}
+.fe-shortcut:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+.fe-shortcut-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: var(--fe-shortcut-bg, #eff6ff);
+    color: var(--fe-shortcut-fg, #1d4ed8);
+}
+.fe-shortcut-icon svg {
+    width: 22px;
+    height: 22px;
+}
+.fe-shortcut-green {
+    --fe-shortcut-bg: #f0fdf4;
+    --fe-shortcut-fg: #15803d;
+}
+.fe-shortcut-amber {
+    --fe-shortcut-bg: #fffbeb;
+    --fe-shortcut-fg: #b45309;
+}
+.fe-shortcut-slate {
+    --fe-shortcut-bg: #f1f5f9;
+    --fe-shortcut-fg: #475569;
+}
+.fe-shortcut-text {
+    min-width: 0;
+    flex: 1;
+}
+.fe-shortcut-text strong,
+.fe-shortcut-text small {
+    display: block;
+}
+.fe-shortcut-text strong {
+    font-size: 14px;
+    letter-spacing: -0.01em;
+}
+.fe-shortcut-text small {
+    margin-top: 3px;
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.4;
+}
+.fe-shortcut-arrow {
+    color: #94a3b8;
+    font-size: 18px;
+}
+.fe-card-link {
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    .fe-shortcut {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Riwayat stok & laporan: filter dan rentang cepat */
+.fe-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+.fe-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 13px;
+    border: 1px solid #dbe3ee;
+    border-radius: 999px;
+    background: #fff;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+}
+.fe-chip:hover {
+    border-color: #93c5fd;
+    color: #1d4ed8;
+}
+.fe-chip:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+.fe-chip.is-active {
+    border-color: #2563eb;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+.fe-keterangan {
+    min-width: 190px;
+    max-width: 320px;
+    font-size: 12px;
+    color: #475569;
+    overflow-wrap: anywhere;
+}
+.fe-pagination {
+    display: flex;
+    justify-content: flex-end;
+    padding: 4px 23px 20px;
+}
+.fe-pagination .pagination {
+    margin: 0;
+    flex-wrap: wrap;
+}
+@media (max-width: 575.98px) {
+    .fe-pagination {
+        justify-content: center;
+        padding: 4px 12px 18px;
+    }
+}
+
+/* Laporan: tombol di header */
+.fe-heading-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+@media (max-width: 575.98px) {
+    .fe-heading-actions {
+        width: 100%;
+    }
+    .fe-heading-actions .btn {
+        flex: 1;
+    }
+}

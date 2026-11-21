@@ -6,7 +6,9 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\PetugasDashboardController;
 use App\Http\Controllers\RiwayatStokController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
@@ -52,16 +54,14 @@ Route::middleware('auth')->group(function () {
         Route::resource('/supplier', SupplierController::class)->except(['create', 'edit', 'show']);
         Route::resource('/kategori', KategoriController::class)->except(['create', 'edit', 'show']);
         Route::resource('/barang', BarangController::class)->except(['create', 'edit', 'show']);
-        Route::get('/laporan', function () {
-            return view('admin.laporan');
-        });
+        Route::get('/laporan', [LaporanController::class, 'index'])->name('admin.laporan.index');
+        Route::get('/laporan/cetak', [LaporanController::class, 'cetak'])->name('admin.laporan.cetak');
+        Route::get('/laporan/export', [LaporanController::class, 'export'])->name('admin.laporan.export');
     });
 
     // Area Petugas (Khusus Petugas)
     Route::middleware('role:petugas')->prefix('petugas')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('petugas.dashboard');
-        });
+        Route::get('/dashboard', PetugasDashboardController::class)->name('petugas.dashboard');
 
         Route::get('/barang-masuk', [BarangMasukController::class, 'index'])->name('petugas.barang-masuk.index');
         Route::post('/barang-masuk', [BarangMasukController::class, 'store'])->name('petugas.barang-masuk.store');
