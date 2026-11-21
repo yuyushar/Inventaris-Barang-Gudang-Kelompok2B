@@ -19,7 +19,7 @@ class BarangKeluarController extends Controller
             'barangs' => Barang::query()
                 ->where('stok_baik', '>', 0)
                 ->orderBy('nama_barang')
-                ->get(['id', 'kode_barang', 'nama_barang', 'satuan', 'stok_baik']),
+                ->get(['id', 'kode_barang', 'nama_barang', 'satuan', 'stok_baik', 'stok_minimum']),
             'barangKeluars' => BarangKeluar::query()
                 ->with(['barang', 'user'])
                 ->latest('tanggal')
